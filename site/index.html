@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group A - Home</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Group A</h1>
+        <p>Meet our team of dedicated members!</p>
+    </header>
+    
+    <main>
+        <section class="team" id="team-section">
+            <!-- Team members will be dynamically loaded here -->
+        </section>
+        <section class="team">
+        	<div class="member">
+                <a href="pages/profile.html?id=${member.id}">
+                    <img src="img/Maz.jpg" alt="Profile image of Maziar Sojoudian">
+                </a>
+                <h2>Maziar Sojoudian</h2>
+                <h3>Instructor</h3>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Function to fetch data from the database via Go server
+        async function fetchTeamMembers() {
+            try {
+                const response = await fetch('/data'); // Fetch data from the server endpoint
+                if (!response.ok) {
+                    throw new Error('Failed to fetch team data');
+                }
+                const members = await response.json(); // Parse JSON response
+                renderTeamMembers(members);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('team-section').innerHTML = 
+                    '<p class="error">Unable to load team data. Please try again later.</p>';
+            }
+        }
+
+        // Function to dynamically render team members on the page
+        function renderTeamMembers(members) {
+            const teamSection = document.getElementById('team-section');
+            teamSection.innerHTML = ''; // Clear existing content
+            members.forEach(member => {
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'member';
+                memberDiv.innerHTML = `
+                    <a href="pages/profile.html?id=${member.id}">
+                        <img src="img/${member.image}" alt="Profile image of ${member.name}">
+                    </a>
+                    <h2>${member.name}</h2>
+                    <p class="role">${member.role}</p>
+                `;
+                teamSection.appendChild(memberDiv);
+            });
+        }
+
+        // Call fetchTeamMembers when the page loads
+        document.addEventListener('DOMContentLoaded', fetchTeamMembers);
+    </script>
+</body>
+</html>

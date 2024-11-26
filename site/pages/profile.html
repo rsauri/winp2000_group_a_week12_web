@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Profile</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Member Profile</h1>
+    </header>
+    
+    <main>
+        <section class="profile" id="profile-section">
+            <!-- Profile content will be dynamically loaded here -->
+        </section>
+    </main>
+
+    <script>
+        // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Function to fetch and display the member's profile
+        async function fetchProfileData(memberId) {
+            try {
+                const response = await fetch(`/api/member/${memberId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch profile data');
+                }
+
+                const member = await response.json();
+                renderProfile(member);
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                document.getElementById('profile-section').innerHTML = 
+                    '<p class="error">Unable to load profile data. Please try again later.</p>';
+            }
+        }
+
+        // Function to render the member profile
+        function renderProfile(member) {
+            const profileSection = document.getElementById('profile-section');
+            profileSection.innerHTML = `
+                <img src="../img/${member.image}" alt="Profile image of ${member.name}">
+                <h2>${member.name}</h2>
+                <p>${member.idno}</p>
+                <p>
+                    <a aria-label="Send email" href="mailto:${member.email}">Email</a>
+                </p>
+                <p><a href="${member.linkedin}" target="_blank">LinkedIn</a></p>
+                <p><a href="${member.github}" target="_blank">GitHub</a></p>
+            `;
+        }
+
+        // When the page loads, fetch the profile based on the ID in the URL
+        document.addEventListener('DOMContentLoaded', () => {
+            const memberId = getQueryParam('id');
+            if (memberId) {
+                fetchProfileData(memberId);
+            } else {
+                document.getElementById('profile-section').innerHTML = 
+                    '<p class="error">No member ID provided. Unable to load profile.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
